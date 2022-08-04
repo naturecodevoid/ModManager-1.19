@@ -44,7 +44,7 @@ class ModListEntry(private val client: MinecraftClient, override val list: ModLi
         RenderSystem.enableBlend()
         DrawableHelper.drawTexture(matrices, x, y, 0.0f, 0.0f, iconSize, iconSize, iconSize, iconSize)
         RenderSystem.disableBlend()
-        val name: Text = LiteralText(mod.name)
+        val name: Text = Text.of(mod.name)
         var trimmedName: StringVisitable = name
         var maxNameWidth = entryWidth - iconSize - 3
         val font = this.client.textRenderer
@@ -54,12 +54,12 @@ class ModListEntry(private val client: MinecraftClient, override val list: ModLi
         if (state == State.INSTALLED) {
             primaryColor = 0xff0e2a55.toInt()
             secondaryColor = 0xff2b4b7c.toInt()
-            badgeText = TranslatableText("modmanager.badge.installed").asOrderedText()
+            badgeText = Text.translatable("modmanager.badge.installed").asOrderedText()
             maxNameWidth -= font.getWidth(badgeText) + 6
         } else if (state == State.OUTDATED) {
             primaryColor = 0xff530C17.toInt()
             secondaryColor = 0xff841426.toInt()
-            badgeText = TranslatableText("modmanager.badge.outdated").asOrderedText()
+            badgeText = Text.translatable("modmanager.badge.outdated").asOrderedText()
             maxNameWidth -= font.getWidth(badgeText) + 6
         }
 
@@ -101,7 +101,7 @@ class ModListEntry(private val client: MinecraftClient, override val list: ModLi
     }
 
     override fun getNarration(): Text {
-        return LiteralText(mod.name)
+        return Text.of(mod.name)
     }
 
 }

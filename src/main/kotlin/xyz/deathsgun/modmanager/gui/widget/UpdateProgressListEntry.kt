@@ -6,9 +6,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawableHelper
-import net.minecraft.client.gui.screen.ScreenTexts
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.text.LiteralText
+import net.minecraft.screen.ScreenTexts
 import net.minecraft.text.Text
 import xyz.deathsgun.modmanager.ModManager
 import xyz.deathsgun.modmanager.api.gui.list.ListWidget
@@ -17,7 +16,7 @@ import xyz.deathsgun.modmanager.update.Update
 
 @OptIn(DelicateCoroutinesApi::class)
 class UpdateProgressListEntry(list: ListWidget<UpdateProgressListEntry>, val update: Update) :
-    ListWidget.Entry<UpdateProgressListEntry>(list, update.mod.id), ProgressListener {
+        ListWidget.Entry<UpdateProgressListEntry>(list, update.mod.id), ProgressListener {
 
     internal var progress = 0.0
     private var pos = 0
@@ -30,16 +29,16 @@ class UpdateProgressListEntry(list: ListWidget<UpdateProgressListEntry>, val upd
     }
 
     override fun render(
-        matrices: MatrixStack,
-        index: Int,
-        y: Int,
-        x: Int,
-        entryWidth: Int,
-        entryHeight: Int,
-        mouseX: Int,
-        mouseY: Int,
-        hovered: Boolean,
-        tickDelta: Float
+            matrices: MatrixStack,
+            index: Int,
+            y: Int,
+            x: Int,
+            entryWidth: Int,
+            entryHeight: Int,
+            mouseX: Int,
+            mouseY: Int,
+            hovered: Boolean,
+            tickDelta: Float
     ) {
         val textRenderer = MinecraftClient.getInstance().textRenderer
         val infoText = "${update.mod.name} v${update.installedVersion} to ${update.version.version}"
@@ -78,6 +77,6 @@ class UpdateProgressListEntry(list: ListWidget<UpdateProgressListEntry>, val upd
     }
 
     override fun getNarration(): Text {
-        return LiteralText.EMPTY
+        return Text.empty()
     }
 }

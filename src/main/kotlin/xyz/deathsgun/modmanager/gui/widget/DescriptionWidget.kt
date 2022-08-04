@@ -51,7 +51,7 @@ class DescriptionWidget(
             }
             addEntry(Entry(this, line))
         }
-        addEntry(Entry(this, LiteralText("")))
+        addEntry(Entry(this, Text.of("")))
     }
 
     override fun getSelectedOrNull(): Entry? {
@@ -66,7 +66,7 @@ class DescriptionWidget(
         return width - 6 + left
     }
 
-    private fun getText(orderedText: OrderedText): LiteralText {
+    private fun getText(orderedText: OrderedText): MutableText {
         val fields = orderedText.javaClass.declaredFields
         var text = ""
         var style = Style.EMPTY
@@ -79,7 +79,7 @@ class DescriptionWidget(
                 style = field.get(orderedText) as Style
             }
         }
-        return LiteralText(text).apply { this.style = style }
+        return MutableText.of(LiteralTextContent(text)).apply { this.style = style }
     }
 
     class Entry(list: ListWidget<Entry>, val text: Text) : ListWidget.Entry<Entry>(list, text.string) {

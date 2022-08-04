@@ -16,13 +16,13 @@
 
 package xyz.deathsgun.modmanager.api.http
 
-import net.minecraft.text.TranslatableText
+import net.minecraft.text.MutableText
 import xyz.deathsgun.modmanager.api.mod.Category
 
 sealed class CategoriesResult {
 
     data class Success(val categories: List<Category>) : CategoriesResult()
 
-    data class Error(val text: TranslatableText, val cause: Exception? = null) : CategoriesResult()
+    data class Error(val text: MutableText, val cause: Exception? = null) : CategoriesResult()
 
 }

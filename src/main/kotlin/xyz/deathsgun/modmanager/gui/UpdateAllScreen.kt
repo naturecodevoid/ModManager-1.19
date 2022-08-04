@@ -2,18 +2,18 @@ package xyz.deathsgun.modmanager.gui
 
 import kotlinx.coroutines.DelicateCoroutinesApi
 import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.gui.screen.ScreenTexts
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.text.TranslatableText
+import net.minecraft.screen.ScreenTexts
+import net.minecraft.text.Text
 import xyz.deathsgun.modmanager.ModManager
 import xyz.deathsgun.modmanager.api.gui.list.IListScreen
 import xyz.deathsgun.modmanager.gui.widget.UpdateProgressListWidget
 import xyz.deathsgun.modmanager.update.Update
 import kotlin.math.min
 
-class UpdateAllScreen(private val parentScreen: Screen) : Screen(TranslatableText("modmanager.title.updating")),
-    IListScreen {
+class UpdateAllScreen(private val parentScreen: Screen) : Screen(Text.translatable("modmanager.title.updating")),
+        IListScreen {
 
     private lateinit var updateList: UpdateProgressListWidget
     private lateinit var doneButton: ButtonWidget
@@ -22,17 +22,17 @@ class UpdateAllScreen(private val parentScreen: Screen) : Screen(TranslatableTex
     @OptIn(DelicateCoroutinesApi::class)
     override fun init() {
         updateList = UpdateProgressListWidget(
-            client!!,
-            width - 50,
-            height - 40,
-            25,
-            height - 50,
-            textRenderer.fontHeight + 4,
-            this
+                client!!,
+                width - 50,
+                height - 40,
+                25,
+                height - 50,
+                textRenderer.fontHeight + 4,
+                this
         )
         updateList.setLeftPos(25)
         doneButton = addDrawableChild(ButtonWidget(width / 2 - 100, height - 30, 200, 20, ScreenTexts.DONE) {
-            onClose()
+            close()
         })
         doneButton.active = false
     }
@@ -71,7 +71,7 @@ class UpdateAllScreen(private val parentScreen: Screen) : Screen(TranslatableTex
         }
     }
 
-    override fun onClose() {
+    override fun close() {
         client?.setScreen(parentScreen)
     }
 

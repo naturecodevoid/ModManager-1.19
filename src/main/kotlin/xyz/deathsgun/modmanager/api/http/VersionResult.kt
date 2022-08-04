@@ -16,12 +16,12 @@
 
 package xyz.deathsgun.modmanager.api.http
 
-import net.minecraft.text.TranslatableText
+import net.minecraft.text.MutableText
 import xyz.deathsgun.modmanager.api.mod.Version
 
 sealed class VersionResult {
 
     data class Success(val versions: List<Version>) : VersionResult()
-    data class Error(val text: TranslatableText, val cause: Exception? = null) : VersionResult()
+    data class Error(val text: MutableText, val cause: Exception? = null) : VersionResult()
 
 }

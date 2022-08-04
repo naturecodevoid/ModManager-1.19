@@ -21,9 +21,8 @@ import com.terraformersmc.modmenu.gui.widget.ModMenuTexturedButtonWidget;
 import com.terraformersmc.modmenu.gui.widget.entries.ModListEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -65,12 +64,12 @@ public abstract class ModsScreenMixin extends Screen {
         int searchBoxWidth = this.paneWidth - 32 - 22;
         this.addDrawableChild(new ModMenuTexturedButtonWidget(this.paneWidth / 2 + searchBoxWidth / 2 + 14,
                 22, 20, 20, 0, 0, MODMANAGER_BUTTON_LOCATION, 32, 64,
-                button -> MinecraftClient.getInstance().setScreen(new ModsOverviewScreen(this)), LiteralText.EMPTY,
+                button -> MinecraftClient.getInstance().setScreen(new ModsOverviewScreen(this)), Text.empty(),
                 (button, matrices, mouseX, mouseY) -> {
                     if (!button.isHovered()) {
                         return;
                     }
-                    this.renderTooltip(matrices, new TranslatableText("modmanager.button.open"), mouseX, mouseY);
+                    this.renderTooltip(matrices, Text.translatable("modmanager.button.open"), mouseX, mouseY);
                 }));
         this.hideButton = this.addDrawableChild(new TexturedButton(width - 24 - 22, paneY, 20, 20, 0,
                 0, MODMANAGER_HIDE_BUTTON, 32, 64, button -> {
@@ -84,9 +83,9 @@ public abstract class ModsScreenMixin extends Screen {
             if (!hideButton.isJustHovered() || !button.isHovered()) {
                 return;
             }
-            TranslatableText text = new TranslatableText("modmanager.button.hide");
+            MutableText text = Text.translatable("modmanager.button.hide");
             if (ModManager.modManager.getConfig().getHidden().contains(selected.getMod().getId())) {
-                text = new TranslatableText("modmanager.button.show");
+                text = Text.translatable("modmanager.button.show");
             }
             this.renderTooltip(matrices, text, mouseX, mouseY);
         })));

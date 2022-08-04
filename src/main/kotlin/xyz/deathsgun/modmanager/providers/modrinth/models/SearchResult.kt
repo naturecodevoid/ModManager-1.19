@@ -17,7 +17,7 @@
 package xyz.deathsgun.modmanager.providers.modrinth.models
 
 import kotlinx.serialization.Serializable
-import net.minecraft.text.TranslatableText
+import net.minecraft.text.Text
 import xyz.deathsgun.modmanager.api.mod.Category
 import xyz.deathsgun.modmanager.api.mod.Mod
 
@@ -33,7 +33,7 @@ data class SearchResult(
                 categoriesList.add(
                     Category(
                         categoryId,
-                        TranslatableText("modmanager.category.${categoryId}")
+                        Text.translatable("modmanager.category.${categoryId}")
                     )
                 )
             }

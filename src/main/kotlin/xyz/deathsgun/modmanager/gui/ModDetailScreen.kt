@@ -19,10 +19,13 @@ package xyz.deathsgun.modmanager.gui
 import com.mojang.blaze3d.systems.RenderSystem
 import com.terraformersmc.modmenu.util.DrawingUtil
 import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.gui.screen.ScreenTexts
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.text.*
+import net.minecraft.screen.ScreenTexts
+import net.minecraft.text.LiteralTextContent
+import net.minecraft.text.MutableText
+import net.minecraft.text.Style
+import net.minecraft.text.Text
 import xyz.deathsgun.modmanager.ModManager
 import xyz.deathsgun.modmanager.api.ModRemoveResult
 import xyz.deathsgun.modmanager.api.gui.list.IListScreen
@@ -32,7 +35,7 @@ import xyz.deathsgun.modmanager.api.mod.State
 import xyz.deathsgun.modmanager.gui.widget.DescriptionWidget
 
 
-class ModDetailScreen(private val previousScreen: Screen, var mod: Mod) : Screen(LiteralText(mod.name)), IListScreen {
+class ModDetailScreen(private val previousScreen: Screen, var mod: Mod) : Screen(Text.of(mod.name)), IListScreen {
 
     private lateinit var actionButton: ButtonWidget
     private lateinit var descriptionWidget: DescriptionWidget
@@ -57,16 +60,16 @@ class ModDetailScreen(private val previousScreen: Screen, var mod: Mod) : Screen
     override fun init() {
         val buttonX = width / 8
         descriptionWidget = addSelectableChild(
-            DescriptionWidget(
-                client!!,
-                width - 20,
-                height - 34,
-                79,
-                height - 30,
-                textRenderer.fontHeight,
-                this,
-                mod.description!!
-            )
+                DescriptionWidget(
+                        client!!,
+                        width - 20,
+                        height - 34,
+                        79,
+                        height - 30,
+                        textRenderer.fontHeight,
+                        this,
+                        mod.description!!
+                )
         )
         descriptionWidget.setLeftPos(10)
         descriptionWidget.init()
@@ -74,39 +77,39 @@ class ModDetailScreen(private val previousScreen: Screen, var mod: Mod) : Screen
             client!!.setScreen(previousScreen)
         })
         this.actionButton = addDrawableChild(
-            ButtonWidget(
-                this.width - buttonX - 150,
-                this.height - 28,
-                150,
-                20,
-                TranslatableText("modmanager.button.install")
-            ) {
-                when (ModManager.modManager.getModState(mod.id)) {
-                    State.DOWNLOADABLE -> {
-                        client!!.setScreen(
-                            ModProgressScreen(
-                                mod,
-                                ModProgressScreen.Action.INSTALL,
-                                previousScreen,
-                                this
+                ButtonWidget(
+                        this.width - buttonX - 150,
+                        this.height - 28,
+                        150,
+                        20,
+                        Text.translatable("modmanager.button.install")
+                ) {
+                    when (ModManager.modManager.getModState(mod.id)) {
+                        State.DOWNLOADABLE -> {
+                            client!!.setScreen(
+                                    ModProgressScreen(
+                                            mod,
+                                            ModProgressScreen.Action.INSTALL,
+                                            previousScreen,
+                                            this
+                                    )
                             )
-                        )
-                    }
-                    State.OUTDATED -> {
-                        client!!.setScreen(
-                            ModProgressScreen(
-                                mod,
-                                ModProgressScreen.Action.UPDATE,
-                                previousScreen,
-                                this
+                        }
+                        State.OUTDATED -> {
+                            client!!.setScreen(
+                                    ModProgressScreen(
+                                            mod,
+                                            ModProgressScreen.Action.UPDATE,
+                                            previousScreen,
+                                            this
+                                    )
                             )
-                        )
+                        }
+                        State.INSTALLED -> {
+                            removeMod()
+                        }
                     }
-                    State.INSTALLED -> {
-                        removeMod()
-                    }
-                }
-            })
+                })
     }
 
     private fun removeMod() {
@@ -118,9 +121,9 @@ class ModDetailScreen(private val previousScreen: Screen, var mod: Mod) : Screen
 
     override fun tick() {
         actionButton.message = when (ModManager.modManager.getModState(mod.id)) {
-            State.INSTALLED -> TranslatableText("modmanager.button.remove")
-            State.DOWNLOADABLE -> TranslatableText("modmanager.button.install")
-            State.OUTDATED -> TranslatableText("modmanager.button.update")
+            State.INSTALLED -> Text.translatable("modmanager.button.remove")
+            State.DOWNLOADABLE -> Text.translatable("modmanager.button.install")
+            State.OUTDATED -> Text.translatable("modmanager.button.update")
         }
     }
 
@@ -138,7 +141,7 @@ class ModDetailScreen(private val previousScreen: Screen, var mod: Mod) : Screen
 
         val font = client!!.textRenderer
 
-        var trimmedTitle: MutableText = LiteralText(font.trimToWidth(mod.name, width - 200))
+        var trimmedTitle: MutableText = MutableText.of(LiteralTextContent(font.trimToWidth(mod.name, width - 200)))
         trimmedTitle = trimmedTitle.setStyle(Style.EMPTY.withBold(true))
 
         var detailsY = 15F
@@ -148,37 +151,37 @@ class ModDetailScreen(private val previousScreen: Screen, var mod: Mod) : Screen
 
         detailsY += 12
         font.draw(
-            matrices,
-            TranslatableText("modmanager.details.author", mod.author),
-            textX, detailsY, 0xFFFFFF
+                matrices,
+                Text.translatable("modmanager.details.author", mod.author),
+                textX, detailsY, 0xFFFFFF
         )
 
         detailsY += 12
         DrawingUtil.drawBadge(
-            matrices, textX.toInt(), detailsY.toInt(),
-            font.getWidth(mod.license) + 6,
-            Text.of(mod.license).asOrderedText(),
-            -0x909396, -0xcecfd1, 0xCACACA
+                matrices, textX.toInt(), detailsY.toInt(),
+                font.getWidth(mod.license) + 6,
+                Text.of(mod.license).asOrderedText(),
+                -0x909396, -0xcecfd1, 0xCACACA
         )
 
         for (category in mod.categories) {
             val textWidth: Int = font.getWidth(category.text) + 6
             DrawingUtil.drawBadge(
-                matrices,
-                textX.toInt(),
-                (detailsY + 14).toInt(),
-                textWidth,
-                category.text.asOrderedText(),
-                -0x909396,
-                -0xcecfd1,
-                0xCACACA
+                    matrices,
+                    textX.toInt(),
+                    (detailsY + 14).toInt(),
+                    textWidth,
+                    category.text.asOrderedText(),
+                    -0x909396,
+                    -0xcecfd1,
+                    0xCACACA
             )
             textX += textWidth + 4
         }
         super.render(matrices, mouseX, mouseY, delta)
     }
 
-    override fun onClose() {
+    override fun close() {
         client!!.setScreen(previousScreen)
     }
 

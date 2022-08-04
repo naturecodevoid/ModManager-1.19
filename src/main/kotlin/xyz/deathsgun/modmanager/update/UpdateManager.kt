@@ -28,7 +28,7 @@ import net.fabricmc.loader.api.FabricLoader
 import net.fabricmc.loader.api.metadata.ModMetadata
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.toast.SystemToast
-import net.minecraft.text.TranslatableText
+import net.minecraft.text.Text
 import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.LogManager
 import xyz.deathsgun.modmanager.ModManager
@@ -93,11 +93,11 @@ class UpdateManager {
             return@runBlocking
         }
         MinecraftClient.getInstance().toastManager.add(
-            SystemToast(
-                SystemToast.Type.TUTORIAL_HINT,
-                TranslatableText("modmanager.toast.update.title"),
-                TranslatableText("modmanager.toast.update.description", getWhitelistedUpdates().size)
-            )
+                SystemToast(
+                        SystemToast.Type.TUTORIAL_HINT,
+                        Text.translatable("modmanager.toast.update.title"),
+                        Text.translatable("modmanager.toast.update.description", getWhitelistedUpdates().size)
+                )
         )
     }
 
@@ -117,11 +117,11 @@ class UpdateManager {
         var result = updateProvider.getVersionsForMod(metadata.id)
         if (result is VersionResult.Success) {
             val version = VersionFinder.findUpdate(
-                metadata.version.friendlyString,
-                ModManager.getMinecraftReleaseTarget(),
-                ModManager.getMinecraftVersionId(),
-                ModManager.modManager.config.updateChannel,
-                result.versions
+                    metadata.version.friendlyString,
+                    ModManager.getMinecraftReleaseTarget(),
+                    ModManager.getMinecraftVersionId(),
+                    ModManager.modManager.config.updateChannel,
+                    result.versions
             )
             verifyUpdate(provider, version, metadata, metadata.id)
             return
@@ -130,20 +130,20 @@ class UpdateManager {
         val queryResult = provider.search(metadata.name, emptyList(), Sorting.RELEVANCE, 0, 10)
         if (queryResult is ModsResult.Error) {
             logger.warn(
-                "Error while searching for fallback id for mod {}: {}",
-                metadata.id,
-                queryResult.cause
+                    "Error while searching for fallback id for mod {}: {}",
+                    metadata.id,
+                    queryResult.cause
             )
             ModManager.modManager.setModState(metadata.id, metadata.id, State.INSTALLED)
             return
         }
         val mod =
-            (queryResult as ModsResult.Success).mods.find { mod ->
-                mod.slug == metadata.id || mod.name.equals(
-                    metadata.name,
-                    true
-                )
-            }
+                (queryResult as ModsResult.Success).mods.find { mod ->
+                    mod.slug == metadata.id || mod.name.equals(
+                            metadata.name,
+                            true
+                    )
+                }
         if (mod == null) {
             logger.warn("Error while searching for fallback id for mod {}: No possible match found", metadata.id)
             ModManager.modManager.setModState(metadata.id, metadata.id, State.INSTALLED)
@@ -159,11 +159,11 @@ class UpdateManager {
             is VersionResult.Success -> result.versions
         }
         val version = VersionFinder.findUpdate(
-            metadata.version.friendlyString,
-            ModManager.getMinecraftReleaseTarget(),
-            ModManager.getMinecraftVersionId(),
-            ModManager.modManager.config.updateChannel,
-            versions
+                metadata.version.friendlyString,
+                ModManager.getMinecraftReleaseTarget(),
+                ModManager.getMinecraftVersionId(),
+                ModManager.modManager.config.updateChannel,
+                versions
         )
         verifyUpdate(provider, version, metadata, mod.id)
     }
@@ -195,11 +195,11 @@ class UpdateManager {
             is VersionResult.Success -> result.versions
         }
         val version = VersionFinder.findUpdate(
-            metadata.version.friendlyString,
-            ModManager.getMinecraftReleaseTarget(),
-            ModManager.getMinecraftVersionId(),
-            ModManager.modManager.config.updateChannel,
-            versions
+                metadata.version.friendlyString,
+                ModManager.getMinecraftReleaseTarget(),
+                ModManager.getMinecraftVersionId(),
+                ModManager.modManager.config.updateChannel,
+                versions
         )
         verifyUpdate(provider, version, metadata, id)
     }
@@ -224,10 +224,10 @@ class UpdateManager {
             is ModResult.Success -> {
                 ModManager.modManager.setModState(metadata.id, modId, State.OUTDATED)
                 logger.info(
-                    "Update for {} found [{} -> {}]",
-                    metadata.id,
-                    metadata.version.friendlyString,
-                    version.version
+                        "Update for {} found [{} -> {}]",
+                        metadata.id,
+                        metadata.version.friendlyString,
+                        version.version
                 )
                 this.updates.add(Update(modResult.mod, metadata.id, metadata.version.friendlyString, version))
             }
@@ -235,6 +235,7 @@ class UpdateManager {
                 logger.error("Failed to resolve mod {}: {}", modId, modResult.cause)
                 ModManager.modManager.setModState(metadata.id, modId, State.INSTALLED)
             }
+            else -> {}
         }
     }
 
@@ -250,23 +251,23 @@ class UpdateManager {
     fun installMod(mod: Mod): ModInstallResult {
         return try {
             val provider = ModManager.modManager.getSelectedProvider()
-                ?: return ModInstallResult.Error(
-                    TranslatableText(
-                        "modmanager.error.noProviderSelected",
-                        ModManager.modManager.config.defaultProvider
+                    ?: return ModInstallResult.Error(
+                            Text.translatable(
+                                    "modmanager.error.noProviderSelected",
+                                    ModManager.modManager.config.defaultProvider
+                            )
                     )
-                )
             val versions = when (val result = provider.getVersionsForMod(mod.id)) {
                 is VersionResult.Error -> return ModInstallResult.Error(result.text, result.cause)
                 is VersionResult.Success -> result.versions
             }
             val version = VersionFinder.findUpdate(
-                "0.0.0.0",
-                ModManager.getMinecraftReleaseTarget(),
-                ModManager.getMinecraftVersionId(),
-                ModManager.modManager.config.updateChannel,
-                versions
-            ) ?: return ModInstallResult.Error(TranslatableText("modmanager.error.noCompatibleModVersionFound"))
+                    "0.0.0.0",
+                    ModManager.getMinecraftReleaseTarget(),
+                    ModManager.getMinecraftVersionId(),
+                    ModManager.modManager.config.updateChannel,
+                    versions
+            ) ?: return ModInstallResult.Error(Text.translatable("modmanager.error.noCompatibleModVersionFound"))
 
             logger.info("Installing {} v{}", mod.name, version.version)
             val dir = FabricLoader.getInstance().gameDir.resolve("mods")
@@ -275,28 +276,28 @@ class UpdateManager {
                 is ModUpdateResult.Error -> ModInstallResult.Error(result.text, result.cause)
             }
         } catch (e: Exception) {
-            ModInstallResult.Error(TranslatableText("modmanager.error.unknown.update", e))
+            ModInstallResult.Error(Text.translatable("modmanager.error.unknown.update", e))
         }
     }
 
     private fun installVersion(
-        mod: Mod,
-        version: Version,
-        dir: Path,
-        fabricId: String = mod.slug,
-        listener: ((Double) -> Unit)? = null
+            mod: Mod,
+            version: Version,
+            dir: Path,
+            fabricId: String = mod.slug,
+            listener: ((Double) -> Unit)? = null
     ): ModUpdateResult {
         return try {
             val assets = version.assets.filter {
                 (it.filename.endsWith(".jar") || it.primary) && !it.filename.contains("forge")
             }
             if (assets.isEmpty()) {
-                return ModUpdateResult.Error(TranslatableText("modmanager.error.update.noFabricJar"))
+                return ModUpdateResult.Error(Text.translatable("modmanager.error.update.noFabricJar"))
             }
             var asset = assets[0]
             if (assets.size > 1) {
                 asset = assets.find { it.filename.contains(ModManager.getMinecraftReleaseTarget(), true) }
-                    ?: return ModUpdateResult.Error(TranslatableText("modmanager.error.update.noFabricJar"))
+                        ?: return ModUpdateResult.Error(Text.translatable("modmanager.error.update.noFabricJar"))
             }
             val jar = dir.resolve(asset.filename) // Download into same directory where the old jar was
             HttpClient.download(encodeURI(asset.url), jar, listener)
@@ -307,10 +308,10 @@ class UpdateManager {
                 jar.delete()
                 logger.error("Deleting {}", jar.absolutePathString())
                 return ModUpdateResult.Error(
-                    TranslatableText(
-                        "modmanager.error.invalidHash",
-                        "SHA-512"
-                    )
+                        Text.translatable(
+                                "modmanager.error.invalidHash",
+                                "SHA-512"
+                        )
                 )
             }
             ModManager.modManager.setModState(fabricId, mod.id, State.INSTALLED)
@@ -319,23 +320,23 @@ class UpdateManager {
             ModUpdateResult.Success
         } catch (e: Exception) {
             if (e is HttpClient.InvalidStatusCodeException) {
-                ModUpdateResult.Error(TranslatableText("modmanager.error.invalidStatus", e.statusCode))
+                ModUpdateResult.Error(Text.translatable("modmanager.error.invalidStatus", e.statusCode))
             }
             e.printStackTrace()
-            ModUpdateResult.Error(TranslatableText("modmanager.error.unknown.update", e))
+            ModUpdateResult.Error(Text.translatable("modmanager.error.unknown.update", e))
         }
     }
 
     fun updateMod(update: Update, listener: ((Double) -> Unit)? = null): ModUpdateResult {
         val oldUpdate = FabricLoader.getInstance().allMods.find { it.metadata.id == update.fabricId }
-            ?: return ModUpdateResult.Error(TranslatableText("modmanager.error.container.notFound"))
+                ?: return ModUpdateResult.Error(Text.translatable("modmanager.error.container.notFound"))
         val oldJar = findJarByModContainer(oldUpdate.metadata)
-            ?: return ModUpdateResult.Error(TranslatableText("modmanager.error.jar.notFound"))
+                ?: return ModUpdateResult.Error(Text.translatable("modmanager.error.jar.notFound"))
         logger.info("Updating {}", update.mod.name)
         try {
             oldJar.delete()
         } catch (e: Exception) {
-            return ModUpdateResult.Error(TranslatableText("modmanager.error.jar.failedDelete", e))
+            return ModUpdateResult.Error(Text.translatable("modmanager.error.jar.failedDelete", e))
         }
         return installVersion(update.mod, update.version, oldJar.parent, update.fabricId, listener)
     }
@@ -348,7 +349,7 @@ class UpdateManager {
     @OptIn(ExperimentalSerializationApi::class)
     fun findJarByModContainer(container: ModMetadata): Path? {
         val jars =
-            FileUtils.listFiles(FabricLoader.getInstance().gameDir.resolve("mods").toFile(), arrayOf("jar"), true)
+                FileUtils.listFiles(FabricLoader.getInstance().gameDir.resolve("mods").toFile(), arrayOf("jar"), true)
         for (jar in jars) {
             try {
                 val meta = openFabricMeta(jar)
@@ -364,14 +365,14 @@ class UpdateManager {
 
     private fun findJarByMod(mod: Mod): Path? {
         val jars =
-            FileUtils.listFiles(FabricLoader.getInstance().gameDir.resolve("mods").toFile(), arrayOf("jar"), true)
+                FileUtils.listFiles(FabricLoader.getInstance().gameDir.resolve("mods").toFile(), arrayOf("jar"), true)
         return try {
             for (jar in jars) {
                 val meta = openFabricMeta(jar)
                 if (meta.id == mod.id || meta.id == mod.slug || meta.id == mod.slug.replace("-", "") ||
-                    meta.custom.modmanager[ModManager.modManager.config.defaultProvider] == mod.id ||
-                    meta.id.replace("_", "-") == mod.id ||
-                    meta.name.equals(mod.name, true)
+                        meta.custom.modmanager[ModManager.modManager.config.defaultProvider] == mod.id ||
+                        meta.id.replace("_", "-") == mod.id ||
+                        meta.name.equals(mod.name, true)
                 ) {
                     return jar.toPath()
                 }
@@ -455,13 +456,13 @@ class UpdateManager {
 
     fun removeMod(mod: Mod): ModRemoveResult {
         val jar = findJarByMod(mod)
-            ?: return ModRemoveResult.Error(TranslatableText("modmanager.error.jar.notFound"))
+                ?: return ModRemoveResult.Error(Text.translatable("modmanager.error.jar.notFound"))
         return try {
             jar.delete()
             ModManager.modManager.setModState(mod.slug, mod.id, State.DOWNLOADABLE)
             ModRemoveResult.Success
         } catch (e: Exception) {
-            return ModRemoveResult.Error(TranslatableText("modmanager.error.jar.failedDelete", e))
+            return ModRemoveResult.Error(Text.translatable("modmanager.error.jar.failedDelete", e))
         }
     }
 

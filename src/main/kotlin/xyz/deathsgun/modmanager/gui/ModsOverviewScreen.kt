@@ -22,13 +22,13 @@ import kotlinx.coroutines.launch
 import net.minecraft.client.gui.Element
 import net.minecraft.client.gui.screen.ConfirmScreen
 import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.gui.screen.ScreenTexts
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.gui.widget.CyclingButtonWidget
 import net.minecraft.client.gui.widget.TextFieldWidget
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.text.LiteralText
-import net.minecraft.text.TranslatableText
+import net.minecraft.screen.ScreenTexts
+import net.minecraft.text.MutableText
+import net.minecraft.text.Text
 import org.lwjgl.glfw.GLFW
 import xyz.deathsgun.modmanager.ModManager
 import xyz.deathsgun.modmanager.api.gui.list.IListScreen
@@ -42,7 +42,7 @@ import xyz.deathsgun.modmanager.gui.widget.ModListEntry
 import xyz.deathsgun.modmanager.gui.widget.ModListWidget
 import kotlin.math.min
 
-class ModsOverviewScreen(private val previousScreen: Screen) : Screen(LiteralText.EMPTY), IListScreen {
+class ModsOverviewScreen(private val previousScreen: Screen) : Screen(Text.empty()), IListScreen {
 
     private var query: String = ""
     private var selectedMod: ModListEntry? = null
@@ -51,7 +51,7 @@ class ModsOverviewScreen(private val previousScreen: Screen) : Screen(LiteralTex
     private var limit: Int = 20
     private var scrollPercentage: Double = 0.0
     private lateinit var searchField: TextFieldWidget
-    private var error: TranslatableText? = null
+    private var error: MutableText? = null
     private var sorting: Sorting = Sorting.RELEVANCE
     private lateinit var sortingButtonWidget: CyclingButtonWidget<Sorting>
     private lateinit var modList: ModListWidget
@@ -64,41 +64,41 @@ class ModsOverviewScreen(private val previousScreen: Screen) : Screen(LiteralTex
     override fun init() {
         client!!.keyboard.setRepeatEvents(true)
         searchField = this.addSelectableChild(
-            TextFieldWidget(
-                textRenderer,
-                10,
-                10,
-                160,
-                20,
-                TranslatableText("modmanager.search")
-            )
+                TextFieldWidget(
+                        textRenderer,
+                        10,
+                        10,
+                        160,
+                        20,
+                        Text.translatable("modmanager.search")
+                )
         )
         searchField.setChangedListener { this.query = it }
 
         sortingButtonWidget = addDrawableChild(
-            CyclingButtonWidget.builder(Sorting::translations)
-                .values(Sorting.RELEVANCE, Sorting.DOWNLOADS, Sorting.NEWEST, Sorting.UPDATED)
-                .build(180, 10, 120, 20, TranslatableText("modmanager.sorting.sort"))
-                { _: CyclingButtonWidget<Any>, sorting: Sorting -> this.sorting = sorting; updateModList() }
+                CyclingButtonWidget.builder(Sorting::translations)
+                        .values(Sorting.RELEVANCE, Sorting.DOWNLOADS, Sorting.NEWEST, Sorting.UPDATED)
+                        .build(180, 10, 120, 20, Text.translatable("modmanager.sorting.sort"))
+                        { _: CyclingButtonWidget<Sorting>, sorting: Sorting -> this.sorting = sorting; updateModList() }
         )
         updateAll = addDrawableChild(
-            ButtonWidget(width - 100 - 10, 10, 100, 20, TranslatableText("modmanager.button.updateAll")) {
-                ModManager.modManager.icons.destroyAll()
-                client?.setScreen(UpdateAllScreen(this))
-            }
+                ButtonWidget(width - 100 - 10, 10, 100, 20, Text.translatable("modmanager.button.updateAll")) {
+                    ModManager.modManager.icons.destroyAll()
+                    client?.setScreen(UpdateAllScreen(this))
+                }
         )
         updateAll.visible = false
 
         categoryList = addSelectableChild(
-            CategoryListWidget(
-                client!!,
-                120,
-                height,
-                35,
-                height - 30,
-                client!!.textRenderer.fontHeight + 4,
-                this
-            )
+                CategoryListWidget(
+                        client!!,
+                        120,
+                        height,
+                        35,
+                        height - 30,
+                        client!!.textRenderer.fontHeight + 4,
+                        this
+                )
         )
         categoryList.setLeftPos(10)
 
@@ -106,28 +106,28 @@ class ModsOverviewScreen(private val previousScreen: Screen) : Screen(LiteralTex
         modList.setLeftPos(135)
 
         addDrawableChild(ButtonWidget(10, height - 25, 120, 20, ScreenTexts.BACK) {
-            onClose()
+            close()
         })
 
         val middle = (width - 135) / 2
         val buttonWidth = min((width - 135 - 20) / 2, 200)
 
         previousPage = addDrawableChild(
-            ButtonWidget(
-                middle - 5,
-                height - 25,
-                buttonWidth,
-                20,
-                TranslatableText("modmanager.page.previous")
-            ) { showPreviousPage() })
+                ButtonWidget(
+                        middle - 5,
+                        height - 25,
+                        buttonWidth,
+                        20,
+                        Text.translatable("modmanager.page.previous")
+                ) { showPreviousPage() })
         nextPage = addDrawableChild(
-            ButtonWidget(
-                middle + buttonWidth + 5,
-                height - 25,
-                buttonWidth,
-                20,
-                TranslatableText("modmanager.page.next")
-            ) { showNextPage() })
+                ButtonWidget(
+                        middle + buttonWidth + 5,
+                        height - 25,
+                        buttonWidth,
+                        20,
+                        Text.translatable("modmanager.page.next")
+                ) { showNextPage() })
 
         GlobalScope.launch {
             val provider = ModManager.modManager.getSelectedProvider() ?: return@launch
@@ -139,7 +139,7 @@ class ModsOverviewScreen(private val previousScreen: Screen) : Screen(LiteralTex
                 is CategoriesResult.Success -> {
                     categoryList.clear()
                     if (ModManager.modManager.update.getWhitelistedUpdates().isNotEmpty()) {
-                        categoryList.add(Category("updatable", TranslatableText("modmanager.category.updatable")))
+                        categoryList.add(Category("updatable", Text.translatable("modmanager.category.updatable")))
                     }
                     categoryList.addCategories(result.categories)
                     modList.scrollAmount = scrollPercentage
@@ -298,24 +298,24 @@ class ModsOverviewScreen(private val previousScreen: Screen) : Screen(LiteralTex
         super.render(matrices, mouseX, mouseY, delta)
     }
 
-    override fun onClose() {
+    override fun close() {
         ModManager.modManager.icons.destroyAll()
         if (!ModManager.modManager.changed) {
             client!!.setScreen(previousScreen)
             return
         }
         client!!.setScreen(
-            ConfirmScreen(
-                {
-                    if (it) {
-                        client!!.scheduleStop()
-                        return@ConfirmScreen
-                    }
-                    client!!.setScreen(previousScreen)
-                },
-                TranslatableText("modmanager.changes.title"),
-                TranslatableText("modmanager.changes.message")
-            )
+                ConfirmScreen(
+                        {
+                            if (it) {
+                                client!!.scheduleStop()
+                                return@ConfirmScreen
+                            }
+                            client!!.setScreen(previousScreen)
+                        },
+                        Text.translatable("modmanager.changes.title"),
+                        Text.translatable("modmanager.changes.message")
+                )
         )
     }
 }

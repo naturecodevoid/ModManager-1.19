@@ -16,10 +16,10 @@
 
 package xyz.deathsgun.modmanager.api.mod
 
-import net.minecraft.text.TranslatableText
+import net.minecraft.text.MutableText
 
 data class Category(
     val id: String,
-    val text: TranslatableText
+    val text: MutableText
 )
 

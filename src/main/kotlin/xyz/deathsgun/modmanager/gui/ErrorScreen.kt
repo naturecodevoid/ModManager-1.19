@@ -19,18 +19,19 @@ package xyz.deathsgun.modmanager.gui
 import net.minecraft.client.font.MultilineText
 import net.minecraft.client.gui.DrawableHelper
 import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.gui.screen.ScreenTexts
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.text.TranslatableText
+import net.minecraft.screen.ScreenTexts
+import net.minecraft.text.MutableText
+import net.minecraft.text.Text
 import net.minecraft.util.math.MathHelper
 
 class ErrorScreen(
-    private val previousScreen: Screen,
-    private val actionScreen: Screen,
-    private val error: TranslatableText
+        private val previousScreen: Screen,
+        private val actionScreen: Screen,
+        private val error: MutableText
 ) :
-    Screen(TranslatableText("modmanager.error.title")) {
+        Screen(Text.translatable("modmanager.error.title")) {
 
     private lateinit var text: MultilineText
 
@@ -39,26 +40,26 @@ class ErrorScreen(
         val linesHeight = this.text.count() * 9
         val bottom = MathHelper.clamp(90 + linesHeight + 12, this.height / 6 + 69, this.height - 24)
         addDrawableChild(
-            ButtonWidget(
-                this.width / 2 - 155,
-                bottom,
-                150,
-                20,
-                ScreenTexts.BACK
-            ) {
-                client!!.setScreen(previousScreen)
-            }
+                ButtonWidget(
+                        this.width / 2 - 155,
+                        bottom,
+                        150,
+                        20,
+                        ScreenTexts.BACK
+                ) {
+                    client!!.setScreen(previousScreen)
+                }
         )
         addDrawableChild(
-            ButtonWidget(
-                this.width / 2 + 5,
-                bottom,
-                150,
-                20,
-                TranslatableText("modmanager.button.tryAgain")
-            ) {
-                client!!.setScreen(actionScreen)
-            }
+                ButtonWidget(
+                        this.width / 2 + 5,
+                        bottom,
+                        150,
+                        20,
+                        Text.translatable("modmanager.button.tryAgain")
+                ) {
+                    client!!.setScreen(actionScreen)
+                }
         )
     }
 

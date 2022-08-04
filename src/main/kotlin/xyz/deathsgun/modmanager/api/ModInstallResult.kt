@@ -16,10 +16,10 @@
 
 package xyz.deathsgun.modmanager.api
 
-import net.minecraft.text.TranslatableText
+import net.minecraft.text.MutableText
 
 sealed class ModInstallResult {
 
     object Success : ModInstallResult()
-    data class Error(val text: TranslatableText, val cause: Exception? = null) : ModInstallResult()
+    data class Error(val text: MutableText, val cause: Exception? = null) : ModInstallResult()
 }

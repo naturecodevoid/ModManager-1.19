@@ -22,12 +22,10 @@ import kotlinx.coroutines.launch
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.MultilineText
 import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.gui.screen.ScreenTexts
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.text.LiteralText
+import net.minecraft.screen.ScreenTexts
 import net.minecraft.text.Text
-import net.minecraft.text.TranslatableText
 import net.minecraft.util.math.MathHelper
 import org.apache.logging.log4j.LogManager
 import xyz.deathsgun.modmanager.ModManager
@@ -37,12 +35,12 @@ import xyz.deathsgun.modmanager.api.mod.Mod
 import kotlin.math.roundToInt
 
 class ModProgressScreen(
-    val mod: Mod,
-    private val action: Action,
-    private val previousScreen: Screen,
-    private val infoScreen: Screen
+        val mod: Mod,
+        private val action: Action,
+        private val previousScreen: Screen,
+        private val infoScreen: Screen
 ) :
-    Screen(LiteralText("")) {
+        Screen(Text.of("")) {
 
     private var status: MultilineText? = null
     private lateinit var backButton: ButtonWidget
@@ -54,15 +52,15 @@ class ModProgressScreen(
     @OptIn(DelicateCoroutinesApi::class)
     override fun init() {
         backButton = addDrawableChild(
-            ButtonWidget(
-                width / 2 - 75,
-                (height * 0.6 + 40).roundToInt(),
-                150,
-                20,
-                ScreenTexts.BACK
-            ) {
-                client!!.setScreen(previousScreen)
-            })
+                ButtonWidget(
+                        width / 2 - 75,
+                        (height * 0.6 + 40).roundToInt(),
+                        150,
+                        20,
+                        ScreenTexts.BACK
+                ) {
+                    client!!.setScreen(previousScreen)
+                })
         backButton.visible = false
         GlobalScope.launch {
             when (action) {
@@ -115,10 +113,10 @@ class ModProgressScreen(
 
 
     private fun installMod() {
-        setStatus(TranslatableText("modmanager.status.installing", mod.name))
+        setStatus(Text.translatable("modmanager.status.installing", mod.name))
         when (val result = ModManager.modManager.update.installMod(mod)) {
             is ModInstallResult.Error -> {
-                LogManager.getLogger().error(result.text.key, result.cause)
+                LogManager.getLogger().error(result.text, result.cause)
                 client!!.send {
                     MinecraftClient.getInstance().setScreen(ErrorScreen(previousScreen, infoScreen, result.text))
                 }
@@ -126,17 +124,17 @@ class ModProgressScreen(
             is ModInstallResult.Success -> {
                 finished = true
                 this.backButton.visible = true
-                setStatus(TranslatableText("modmanager.status.install.success", mod.name))
+                setStatus(Text.translatable("modmanager.status.install.success", mod.name))
             }
         }
     }
 
     private fun updateMod() {
-        setStatus(TranslatableText("modmanager.status.updating", mod.name))
+        setStatus(Text.translatable("modmanager.status.updating", mod.name))
         val update = ModManager.modManager.update.getUpdateForMod(mod) ?: return
         when (val result = ModManager.modManager.update.updateMod(update)) {
             is ModUpdateResult.Error -> {
-                LogManager.getLogger().error(result.text.key, result.cause)
+                LogManager.getLogger().error(result.text, result.cause)
                 client!!.send {
                     MinecraftClient.getInstance().setScreen(ErrorScreen(previousScreen, infoScreen, result.text))
                 }
@@ -144,7 +142,7 @@ class ModProgressScreen(
             is ModUpdateResult.Success -> {
                 finished = true
                 this.backButton.visible = true
-                setStatus(TranslatableText("modmanager.status.update.success", mod.name))
+                setStatus(Text.translatable("modmanager.status.update.success", mod.name))
             }
         }
     }
@@ -153,7 +151,7 @@ class ModProgressScreen(
         status = MultilineText.create(textRenderer, text, width - 2 * (width / 8))
     }
 
-    override fun onClose() {
+    override fun close() {
         client!!.setScreen(previousScreen)
     }
 

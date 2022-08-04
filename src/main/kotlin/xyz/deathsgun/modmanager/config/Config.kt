@@ -22,8 +22,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.text.MutableText
 import net.minecraft.text.Text
-import net.minecraft.text.TranslatableText
 import xyz.deathsgun.modmanager.api.mod.VersionType
 import java.nio.charset.Charset
 import java.nio.file.Files
@@ -72,8 +72,8 @@ data class Config(
     enum class UpdateChannel {
         ALL, STABLE, UNSTABLE;
 
-        fun text(): Text {
-            return TranslatableText(String.format("modmanager.channel.%s", name.lowercase()))
+        fun text(): MutableText {
+            return Text.translatable(String.format("modmanager.channel.%s", name.lowercase()))
         }
 
         fun isReleaseAllowed(type: VersionType): Boolean {

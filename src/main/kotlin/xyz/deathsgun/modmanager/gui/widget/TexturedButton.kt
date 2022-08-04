@@ -19,34 +19,34 @@ package xyz.deathsgun.modmanager.gui.widget
 import com.mojang.blaze3d.systems.RenderSystem
 import com.terraformersmc.modmenu.gui.widget.ModMenuTexturedButtonWidget
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.text.LiteralText
+import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
 class TexturedButton(
-    x: Int,
-    y: Int,
-    width: Int,
-    height: Int,
-    private val u: Int,
-    private val v: Int,
-    texture: Identifier,
-    private val uWidth: Int,
-    private val vHeight: Int,
-    onPress: PressAction?,
-    tooltipSupplier: TooltipSupplier
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        private val u: Int,
+        private val v: Int,
+        texture: Identifier,
+        private val uWidth: Int,
+        private val vHeight: Int,
+        onPress: PressAction?,
+        tooltipSupplier: TooltipSupplier
 ) : ModMenuTexturedButtonWidget(
-    x,
-    y,
-    width,
-    height,
-    u,
-    v,
-    texture,
-    uWidth,
-    vHeight,
-    onPress,
-    LiteralText.EMPTY,
-    tooltipSupplier
+        x,
+        y,
+        width,
+        height,
+        u,
+        v,
+        texture,
+        uWidth,
+        vHeight,
+        onPress,
+        Text.empty(),
+        tooltipSupplier
 ) {
 
     var image: Identifier = texture
@@ -62,8 +62,8 @@ class TexturedButton(
             adjustedV += height
         }
         drawTexture(
-            matrices,
-            x, y, u.toFloat(), adjustedV.toFloat(), width, height, uWidth, vHeight
+                matrices,
+                x, y, u.toFloat(), adjustedV.toFloat(), width, height, uWidth, vHeight
         )
         RenderSystem.enableDepthTest()
         if (this.isHovered) {
